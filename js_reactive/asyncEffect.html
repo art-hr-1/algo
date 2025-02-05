@@ -1,0 +1,170 @@
+<!-- https://habr.com/ru/companies/timeweb/articles/725504/ -->
+ 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>asyncEffect</title>
+</head>
+
+<body>
+
+</body>
+
+<body>
+    <div>
+        <!-- <button>0</button> -->
+        <button>2</button>
+        <button>4</button>
+        <button>6</button>
+    </div>
+    <p id="counter">0</p>
+    <p>Last button clicked: <span id="last-btn"></span></p>
+    <p id="counterSecond">0</p>
+</body>
+
+<script>
+    let currentListener
+
+    function createSignal(initialValue) {
+        let value = initialValue
+        const subscribers = new Set()
+
+        const read = () => {
+            if (currentListener) {
+                subscribers.add(currentListener)
+            }
+            return value
+        }
+
+        const write = (newValue) => {
+            value = newValue
+            subscribers.forEach((fn) => fn())
+        }
+
+        return [read, write]
+    }
+
+    // function createEffect(callback) {
+    //     currentListener = callback
+    //     callback()
+    //     currentListener = null
+    // }
+
+    // local function is need to fix this case
+    // createEffect(() => {
+    //     button.textContent = countA() || countB();
+    // })
+    // 
+    function createEffect(callback) {
+        const effect = () => {
+            currentListener = effect
+            callback()
+            currentListener = undefined
+        }
+        effect()
+    }
+    // createEffect
+    // callback
+    // currentListener = effect
+    // createSignalA.read
+    // end callback
+    // currentListener = null
+    // updateSignal
+    // subsribers.listeners[0] === effect
+    // currentListener = effect
+    // createSignalB.read
+    // ...
+
+    // ==========
+
+    const subscribers = new Set()
+
+    function createSignal2(initialValue) {
+        let value = initialValue
+
+        const read = () => {
+            return value
+        }
+
+        const write = (newValue) => {
+            value = newValue
+            subscribers.forEach((fn) => fn())
+        }
+
+        return [read, write]
+    }
+
+    function createEffect2(callback) {
+        subscribers.add(callback)
+        callback()
+    }
+
+    // ==========
+
+    const randInt = (min, max) => Math.floor(min + Math.random() * (max - min + 1))
+    const sleep = (ms) => new Promise((res) => setTimeout(res, ms))
+
+    const [count, setCount] = createSignal(0)
+    const [countSecond, setCountSecond] = createSignal(0)
+    // const [count, setCount] = createSignal2(0)
+
+    const counter = document.getElementById('counter')
+    const counterSecond = document.getElementById('counterSecond')
+    const lastBtn = document.getElementById('last-btn')
+
+    createEffect(() => {
+        // createEffect2(() => {
+        counter.textContent = count() || countSecond()
+    })
+
+    const getData = async () => await sleep(randInt(1, 2) * 1000)
+    // let currentSleep = 3;
+    // const getData2 = async () => await sleep(currentSleep-- * 1000)
+
+    const update = async (n) => {
+        await getData()
+        // await getData2()
+        setCount(n)
+        setCountSecond(n)
+    }
+
+    const buttons = [...document.querySelectorAll('button')]
+    buttons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const n = btn.textContent
+            lastBtn.textContent = n
+            update(n)
+        })
+    })
+    buttons.forEach((btn) => { btn.click() })
+    buttons.reverse().forEach((btn) => { btn.click() })
+</script>
+
+<style>
+    HTML CSS JS Result Skip Results Iframe EDIT ON button {
+        background: linear-gradient(yellow, orange);
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 4px;
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+        color: #333;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: box-shadow 150ms ease-in-out;
+        cursor: pointer;
+    }
+
+    button:active {
+        box-shadow: none;
+    }
+
+    p {
+        color: #333;
+        font-size: 1.4rem;
+    }
+</style>
+
+</html>

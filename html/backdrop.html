@@ -1,0 +1,70 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <!-- this is an example from the MDN Layout Cookbook -->
+    <title>backdrop</title>
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <style>
+        .app {
+            position: relative;
+            background: gainsboro;
+        }
+        /* .app, */
+        .app > :has(:not(.focus)) {
+            filter: brightness(.8);
+            /* background: gainsboro; */
+        }
+
+        .background {
+            position: absolute;
+            inset: 0;
+            filter: brightness(.8);
+            background: white;
+            pointer-events: none;
+            width: 300px;
+            height: 300px;
+        }
+        .background::backdrop {
+            background: red;
+        }
+        .button {
+            position: inherit;
+            padding: 10px;
+            /* background: antiquewhite; */
+            display: inline-block;
+        }
+        .focus {
+            background: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <!-- <div class="background"></div> -->
+        <div class="button">button</div>
+        <div class="button">button</div>
+        <div class="button">button</div>
+        <div>
+            <div>
+                <div class="button">button</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    const buttons = document.querySelectorAll(".button");
+    buttons.forEach(x => x.addEventListener("click", (event) => {
+        event.target.classList.toggle("focus");
+    }))
+
+</script>
+
+</html>

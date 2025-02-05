@@ -1,0 +1,103 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <!-- this is an example from the MDN Layout Cookbook -->
+    <title>compare</title>
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <style>
+        .container {
+            position: relative;
+            width: 80vw;
+            height: 40vh;
+        }
+
+        .a {
+            position: absolute;
+            inset: 0;
+            background: red;
+
+        }
+        .a__content {
+            display: flex;
+            justify-content: center;
+        }
+
+        .b {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(green, green);
+            background-repeat: no-repeat;
+            background-size: 50%;
+
+        }
+        .b__content {
+            margin-block-start: 50px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .divider {
+            position: absolute;
+            inset: 0 50%;
+            width: 20px;
+            background: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="a">
+            <div class="a__content">
+                <button>1</button>
+                <button>2</button>
+            </div>
+        </div>
+        <div class="b">
+            <div class="b__content">
+                <button>3</button>
+                <button>4</button>
+            </div>
+        </div>
+        <div class="divider"></div>
+    </div>
+</body>
+
+<script>
+    function useDivider() {
+        let isClicked = false;
+
+        /** @type HTMLElement */
+        const container = document.querySelector(".container")
+        const a = document.querySelector(".a")
+        const b = document.querySelector(".b")
+        const divider = document.querySelector(".divider")
+
+        const offset = divider.clientWidth
+
+        const changeSplit = (ev, force) => {
+            if (!force) return
+            // dont know why not 2
+            let x = ev.x - (offset / 1.5)
+            x = x > 0 ? x : 0
+            divider.style = `inset-inline-start: ${x}px`
+            b.style = `background-size: ${x}px`
+        }
+
+        container.addEventListener("mousedown", (ev) => isClicked = true)
+        container.addEventListener("mouseup", (ev) => isClicked = false)
+        container.addEventListener("click", (ev) => changeSplit(ev, true))
+        container.addEventListener("mousemove", (ev) => changeSplit(ev, isClicked))
+    }
+    useDivider()
+
+</script>
+
+</html>
